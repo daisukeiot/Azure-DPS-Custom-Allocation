@@ -348,3 +348,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+DpsCustomPolicySample/DpsCustomPolicySample/Properties/serviceDependencies.PVDemo-Functions - Zip Deploy.json
+DpsCustomPolicySample/DpsCustomPolicySample/Properties/ServiceDependencies/PVDemo-Functions - Zip Deploy/profile.arm.json
+DpsCustomPolicySample/DpsCustomPolicySample/Properties/ServiceDependencies/PVDemo-Functions - Zip Deploy/storage1.arm.json

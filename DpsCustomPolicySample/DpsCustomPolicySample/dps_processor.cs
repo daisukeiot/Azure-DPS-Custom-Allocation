@@ -172,15 +172,33 @@ namespace DpsCustomPolicySample
                                 var component = parsedModel.Where(r => r.Value.EntityKind == DTEntityKind.Component).Select(x => x.Value as DTComponentInfo).Where(x => x.Schema.Id.ToString() == property.ChildOf.AbsoluteUri).FirstOrDefault();
                                 if (component != null)
                                 {
-                                    componentName = component.Name;
+                                    TwinCollection componentTwin = new TwinCollection();
+                                    TwinCollection hostnameComponentTwin = new TwinCollection();
+                                    // Hostname takes a parameter as JSON Object
+                                    // JSON looks like this
+                                    // "desired" : {
+                                    //   "R700": {
+                                    //     "__t": "c",
+                                    //     "Hostname" : {
+                                    //       "hostname" : "<New Name>"
+                                    //     }
+                                    //   }
+                                    // }
+                                    if (property.Schema.EntityKind == DTEntityKind.Object)
+                                    {
+                                        DTObjectInfo parameterObj = property.Schema as DTObjectInfo;
+                                        hostnameComponentTwin[parameterObj.Fields[0].Name] = "impinj-14-04-63-01-Functions";
+                                        componentTwin[property.Name] = hostnameComponentTwin;
+                                        componentTwin["__t"] = "c";
+                                        desiredProperties[component.Name] = componentTwin;
+                                    }
                                 }
                             }
-
-                            desiredProperties[componentName][property.Name] = "impinj-14-04-63-01-functions";
-                            if (!string.IsNullOrEmpty(componentName))
+                            else
                             {
-                                desiredProperties[componentName]["__t"] = "c";
+                                desiredProperties[property.Name] = "impinj-14-04-63-01-functions";
                             }
+
                         }
                     }
 

@@ -1,0 +1,375 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "ResourcePrefix": {
+      "defaultValue": "DEMOCA",
+      "type": "string",
+      "metadata": {
+        "description": "Prefix for services.  E.g. your name.  Must be Alphanumeric (a~z, 0~9), and 5~12 characters"
+      },
+      "minLength": 5,
+      "maxLength": 12
+    },
+    "UniqueID": {
+      "defaultValue": "[take(uniqueString(resourceGroup().id),5)]",
+      "type": "string",
+      "metadata": {
+        "description": "Unique ID.  E.g. your name.  Must be Alphanumeric (a~z, 0~9), and 5~12 characters"
+      },
+      "minLength": 5,
+      "maxLength": 12
+    },
+    "IothubSku": {
+      "type": "string",
+      "allowedValues": [
+        "F1",
+        "S1"
+      ],
+      "defaultValue": "S1"
+    },
+    "FunctionsRepoUrl": {
+      "type": "string",
+      "defaultValue": "https://github.com/daisukeiot/Azure-DPS-Custom-Allocation.git"
+    },
+    "FunctionsRepoBranch": {
+      "type": "string",
+      "defaultValue": "main"
+    }
+  },
+  "variables": {
+    "git-repo": {
+      "functions": "[parameters('FunctionsRepoUrl')]",
+      "functionsBranch": "[parameters('FunctionsRepoBranch')]"
+    },
+    "location": "[resourceGroup().location]",
+    "iothub": {
+      "name": "[format('{0}-{1}-hub', resourceGroup().name, parameters('ResourcePrefix'))]",
+      "systemTopicName": "IoTHubEventGridSystemTopic"
+    },
+    "storageName": "[toLower(format('{0}{1}storage', resourceGroup().name, parameters('ResourcePrefix')))]",
+    "dpsName": "[format('{0}-{1}-dps', resourceGroup().name, parameters('ResourcePrefix'))]",
+    "functionsApp": {
+      "hostingPlan": "[concat(parameters('ResourcePrefix'), '-HostingPlan-', parameters('UniqueID'))]",
+      "name": "[format('{0}-{1}-function', resourceGroup().name, parameters('ResourcePrefix'))]"
+    },
+    "envTag": "v0.1"
+  },
+  "resources": [
+    {
+      "name": "Deploy-Azure-IoT-Services",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[resourceGroup().name]",
+      "apiVersion": "2021-04-01",
+      "comments": "Deploy Resources",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "outer"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "variables": {},
+          "resources": [
+            {
+              "name": "[variables('iothub').name]",
+              "type": "Microsoft.Devices/IotHubs",
+              "apiVersion": "2021-03-31",
+              "location": "[variables('location')]",
+              "sku": {
+                "name": "[parameters('IothubSku')]",
+                "capacity": 1
+              }
+            },
+            {
+              "name": "[variables('dpsName')]",
+              "type": "Microsoft.Devices/provisioningServices",
+              "apiVersion": "2020-03-01",
+              "location": "[variables('location')]",
+              "dependsOn": [],
+              "sku": {
+                "name": "S1",
+                "capacity": 1
+              },
+              "properties": {}
+            },
+            {
+              "name": "[variables('storageName')]",
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2021-04-01",
+              "location": "[variables('location')]",
+              "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+              },
+              "kind": "Storage",
+              "properties": {
+                "networkAcls": {
+                  "bypass": "AzureServices",
+                  "virtualNetworkRules": [],
+                  "ipRules": [],
+                  "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                  "services": {
+                    "file": {
+                      "keyType": "Account",
+                      "enabled": true
+                    },
+                    "blob": {
+                      "keyType": "Account",
+                      "enabled": true
+                    }
+                  },
+                  "keySource": "Microsoft.Storage"
+                }
+              }
+            },
+            {
+              "name": "[variables('functionsApp').hostingPlan]",
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2020-12-01",
+              "location": "[variables('location')]",
+              "tags": {
+                "ENV": "[variables('envTag')]"
+              },
+              "sku": {
+                "name": "S1"
+              },
+              "kind": "app",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+              ],
+              "properties": {
+                "workerSize": 0,
+                "numberOfWorkers": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[variables('iothub').name]",
+      "type": "Microsoft.Devices/IotHubs",
+      "apiVersion": "2021-03-31",
+      "comments": "Define IoT Hub to create Event Grid system topic below",
+      "location": "[variables('location')]",
+      "tags": {
+        "ENV": "[variables('envTag')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'Deploy-Azure-IoT-Services')]"
+      ],
+      "sku": {
+        "name": "[parameters('IothubSku')]",
+        "capacity": 1
+      },
+      "identity": {
+        "type": "None"
+      },
+      "properties": {}
+    },
+    {
+      "name": "[variables('iothub').systemTopicName]",
+      "type": "Microsoft.EventGrid/systemTopics",
+      "apiVersion": "2020-10-15-preview",
+      "comments": "Create Event Grid system topic for IoT Hub device events",
+      "location": "[variables('location')]",
+      "tags": {
+        "ENV": "[variables('envTag')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'Deploy-Azure-IoT-Services')]"
+      ],
+      "properties": {
+        "source": "[resourceId('Microsoft.Devices/IotHubs', variables('iothub').name)]",
+        "topicType": "Microsoft.Devices.IoTHubs"
+      }
+    },
+    {
+      "name": "[variables('dpsName')]",
+      "type": "Microsoft.Devices/provisioningServices",
+      "apiVersion": "2020-03-01",
+      "comments": "Configure DPS.  Link IoT Hub",
+      "location": "[variables('location')]",
+      "tags": {
+        "ENV": "[variables('envTag')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'Deploy-Azure-IoT-Services')]"
+      ],
+      "sku": {
+        "name": "S1",
+        "tier": "Standard",
+        "capacity": 1
+      },
+      "properties": {
+        "iotHubs": [
+          {
+            "applyAllocationPolicy": true,
+            "connectionString": "[concat('HostName=', reference(resourceId('Microsoft.Devices/IoTHubs', variables('iothub').name), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).hostName, ';SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs', variables('iothub').name), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).value[0].primaryKey)]",
+            "location": "[resourceGroup().location]"
+          }
+        ],
+        "allocationPolicy": "Hashed"
+      }
+    },
+    {
+      "name": "[variables('storageName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "comments": "Define Storage Account.  Storage Account is reated in Deploy-Azure-IoT-Services",
+      "location": "[variables('location')]",
+      "tags": {
+        "ENV": "[variables('envTag')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'Deploy-Azure-IoT-Services')]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "Storage",
+      "properties": {}
+    },
+    {
+      "name": "Deploy-Functions",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[resourceGroup().name]",
+      "apiVersion": "2021-04-01",
+      "comments": "Deploy Functions app from Github",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'Deploy-Azure-IoT-Services')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "outer"
+        },
+        "parameters": {},
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "variables": {},
+          "resources": [
+            {
+              "name": "[variables('functionsApp').name]",
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2020-12-01",
+              "kind": "functionapp",
+              "location": "[variables('location')]",
+              "tags": {
+                "ENV": "[variables('envTag')]"
+              },
+              "dependsOn": [],
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "name": "[variables('functionsApp').name]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('functionsApp').hostingPlan)]",
+                "clientAffinityEnabled": false,
+                "enabled": true,
+                "siteConfig": {
+                  "alwaysOn": false,
+                  "cors": {
+                    "allowedOrigins": [
+                      "*"
+                    ]
+                  },
+                  "appSettings": [
+                    {
+                      "name": "FUNCTIONS_EXTENSION_VERSION",
+                      "value": "~3"
+                    },
+                    {
+                      "name": "AzureWebJobsSecretStorageType",
+                      "value": "Files"
+                    }
+                  ]
+                }
+              },
+              "resources": [
+                {
+                  "name": "web",
+                  "type": "sourcecontrols",
+                  "apiVersion": "2020-12-01",
+                  "dependsOn": [
+                    "[resourceId('Microsoft.Web/Sites', variables('functionsApp').name)]"
+                  ],
+                  "properties": {
+                    "repoUrl": "[variables('git-repo').functions]",
+                    "branch": "[variables('git-repo').functionsBranch]",
+                    "IsManualIntegration": true
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[concat(variables('functionsApp').name, '/appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2020-12-01",
+      "comments": "Set Functions Apps settings",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'Deploy-Functions')]"
+      ],
+      "properties": {
+        "FUNCTIONS_EXTENSION_VERSION": "~3",
+        "AzureWebJobsSecretStorageType": "Files",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+        "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-06-01').keys[0].value)]",
+        "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-06-01').keys[0].value)]",
+        "IOTHUB_CS": "[concat('HostName=', reference(resourceId('Microsoft.Devices/IoTHubs', variables('iothub').name), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).hostName, ';SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs', variables('iothub').name), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).value[0].primaryKey)]",
+        "PRIVATE_MODEL_REPOSIROTY_URL": ""
+      }
+    },
+    {
+      "name": "GetFunctionKey",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'Deploy-Functions')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/daisukeiot/Azure-DPS-Custom-Allocation/main/deploy/GetFunctionUrl.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "functionAppName": {
+            "value": "[variables('functionsApp').name]"
+          },
+          "functionName": {
+            "value": "dps_processor"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "UniqueId": {
+      "type": "String",
+      "value": "[parameters('UniqueID')]"
+    },
+    "DpsWebHookUrl": {
+      "type": "String",
+      "value": "[reference('GetFunctionKey').outputs.functionTriggerUrl.value]"
+    },
+    "CreateGroupEnrollment": {
+      "type": "String",
+      "value":  "[format('az extension add --name azure-iot; az iot dps enrollment-group create -g {0} --dps-name {1} --enrollment-id SampleGroupEnrollment --allocation-policy custom --webhook-url {2}', resourceGroup().name, variables('dpsName'), reference('GetFunctionKey').outputs.functionTriggerUrl.value)]"
+    }
+  }
+}

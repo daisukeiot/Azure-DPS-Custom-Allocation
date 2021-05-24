@@ -369,7 +369,7 @@
     },
     "CreateGroupEnrollment": {
       "type": "String",
-      "value":  "[format('az extension add --name azure-iot; az iot dps enrollment-group create -g {0} --dps-name {1} --enrollment-id SampleGroupEnrollment --allocation-policy custom --webhook-url {2}', resourceGroup().name, variables('dpsName'), reference('GetFunctionKey').outputs.functionTriggerUrl.value)]"
+      "value": "[format('az extension add --name azure-iot; az iot dps enrollment-group create -g {0} --dps-name {1} --enrollment-id SampleGroupEnrollment --allocation-policy custom --webhook-url {2}', resourceGroup().name, variables('dpsName'), reference('GetFunctionKey').outputs.functionTriggerUrl.value)]"
     }
   }
 }

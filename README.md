@@ -40,7 +40,7 @@ Resources are named in following way:
 - \<Resource Group Name>\<Unique ID>stor  
   etc
 
-## 2. Click `Reivew + create` to start deployment
+## 2. Click `Review + create` to start deployment
 
 ![Portal 02](media/Azure-Portal-02.png)
 
@@ -58,7 +58,7 @@ Select `Outputs` from left pane
 
 You will find multiple outputs.
 
-| Output                     | Description                                                                          | 
+| Output                     | Description                                                                          |
 |----------------------------|--------------------------------------------------------------------------------------|
 | UniqueId                   | Unique ID used for this deployment                                                   |
 | DpsWebHookUrl              | Webhook URL for DPS's Custom Allocation                                              |
@@ -85,7 +85,7 @@ You will find multiple outputs.
 
 ### Option 2: Run Az CLI on your computer
 
-1. Follow the instruction [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) to install Az CLI
+1. Follow the instruction [here](https://docs.microsoft.com/cli/azure/install-azure-cli) to install Az CLI
 1. Copy and paste `createGroupEnrollment` from `outputs`
 
 ### Option 3: Manually create in Azrue Portal
@@ -124,7 +124,7 @@ You will find multiple outputs.
 Configure your device with ID Scope, Symmetric Key, and Registration Id.
 
 > [!TIP]  
-> After creating enrollment(s), you can use symmetrick key from AZ CLI output and ID Scope from `outputs` to configure your devices
+> After creating enrollment(s), you can use symmetric key from AZ CLI output and ID Scope from `outputs` to configure your devices
 > ![Portal 06](media/Azure-Portal-06.png)
 
 ## 5. Provision device
@@ -137,8 +137,9 @@ When a device is provisioned, following operations take place.
     - Desired Properties  
         - "FromDpsWebHook1" : "InitialTwinByCustomAllocation"
         - "FromDpsWebHook2" : \<Registration ID of the enrollment list>
-    - For Impinj R700, it sets "Hostname" Property to change deivce's host name using IoT Plug and Play Device Model (and Parser)  
-        The hostname will be set to impinj-<YYYYMMDD>-<HHMMSS>
+    - For Impinj R700, it sets "Hostname" Property to change host name using IoT Plug and Play Device Model (and Parser)  
+
+        The hostname will be set to impinj-\<YYYYMMDD>-\<HHMMSS>
 
 1. The device is authenticated and DPS creates Device Identity in IoT Hub
 
@@ -152,7 +153,7 @@ When a device is provisioned, following operations take place.
 
 1. The device initiates authentication and connection to the IoT Hub
 
-1. The connection to IoT Hub is established 
+1. The connection to IoT Hub is established  
 
     IoT Hub publishes `DeviceConnected` event to Event Grid.
 
@@ -163,8 +164,10 @@ When a device is provisioned, following operations take place.
     - For Impinj device, it sends `Presets` command
     - For Seeed Wio Terminal, it sends `ringBuzzer` command
 
+![Explorer-01](media/IoT-Explorer-01.png)
+
 ### Flow Chart
 
 Summary of Device Provisioning flow ([PDF](https://github.com/daisukeiot/Azure-DPS-Custom-Allocation/blob/main/media/DPS-IoTHub-ProvisioningFlow.pdf))
-
-![FlotChart](media/FlowChart.png)
+  
+![FlowChart](media/FlowChart.png)

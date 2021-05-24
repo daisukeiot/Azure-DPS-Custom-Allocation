@@ -140,8 +140,7 @@ namespace DpsCustomPolicySample
                     // build initial twin (Desired Properties) for the device
                     // these values will be passed to the device during Initial Get
                     TwinCollection desiredProperties = new TwinCollection();
-                    desiredProperties["DesiredTest1"] = "InitilTwinByCustomAllocation";
-                    desiredProperties["DesiredTest2"] = registrationId;
+                    desiredProperties["DesiredTest1"] = "InitialTwinByCustomAllocation";
                     desiredProperties["DpsRegistrationId"] = registrationId;
 
                     // Get DTDL Model Id

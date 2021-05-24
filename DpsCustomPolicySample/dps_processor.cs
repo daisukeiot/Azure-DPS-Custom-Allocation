@@ -32,6 +32,7 @@ namespace DpsCustomPolicySample
             DpsResponse response = new DpsResponse();
             bool isGroupEnrollment = false;
             string registrationId;
+            DateTime localDate = DateTime.Now;
 
             _logger = log;
 
@@ -163,6 +164,7 @@ namespace DpsCustomPolicySample
                         
                         if (property != null)
                         {
+                            var dateString = $"{localDate.Year}{localDate.Month}{localDate.Day}-{localDate.Hour}{localDate.Minute}{localDate.Second}";
                             log.LogInformation($"Found Writable Property '{propertyName}'");
 
                             // If no match, this interface must be from Component
@@ -186,7 +188,7 @@ namespace DpsCustomPolicySample
                                     if (property.Schema.EntityKind == DTEntityKind.Object)
                                     {
                                         DTObjectInfo parameterObj = property.Schema as DTObjectInfo;
-                                        hostnameComponentTwin[parameterObj.Fields[0].Name] = "impinj-14-04-63-01-Functions";
+                                        hostnameComponentTwin[parameterObj.Fields[0].Name] = $"impinj-{dateString}";
                                         componentTwin[property.Name] = hostnameComponentTwin;
                                         componentTwin["__t"] = "c";
                                         desiredProperties[component.Name] = componentTwin;
@@ -195,7 +197,7 @@ namespace DpsCustomPolicySample
                             }
                             else
                             {
-                                desiredProperties[property.Name] = "impinj-14-04-63-01-functions";
+                                desiredProperties[property.Name] = $"impinj-{dateString}";
                             }
 
                         }

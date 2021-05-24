@@ -230,7 +230,7 @@ namespace DpsCustomPolicySample
                 // We do not know Model ID at this point.  Model ID is passed by the device when it connects (Model ID Announcement).
                 // Operations using Device model must be done in DPS Custom Allocation function.
                 //
-                twin.Tags["EventGrid"] = "Processed";
+                twin.Tags["TagFromEventGrid"] = "Processed";
                 twin = await _registryManager.UpdateTwinAsync(deviceId, twin, twin.ETag);
             }
             catch (Exception ex)

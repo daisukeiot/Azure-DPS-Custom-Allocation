@@ -28,7 +28,8 @@ Provide following parameters
 | Functions Repo Branch | Branch name of Functions source code to deploy |                                              |
 
 > [!TIP]  
-> Storage Service name is up to 24 characters.  Keep name of resource group and unique id less than 20 characters
+> Storage Service name is up to 24 characters.  Keep name of resource group and unique id less than 20 characters.  
+> ARM template add `stor` to the end of name.
 
 Resources are named in following way:
 
@@ -132,11 +133,12 @@ When a device is provisioned, following operations take place.
 
 1. During DPS register operation, `dps_processor` function adds Tags and Desired Properties to device's Device Twin  
 
-    - Tag : "TagExample":"CustomAllocationSample"
+    - Tag : "TagFromDpsWebHook":"CustomAllocationSample"
     - Desired Properties  
-        - "DesiredTest1" : "InitialTwinByCustomAllocation"
-        - "DpsRegistrationId" : \<Registration ID of the enrollment list>
-    - For Impinj R700, it sets "Hostname" Property to change deivce's host name using IoT Plug and Play Device Model (and Parser)
+        - "FromDpsWebHook1" : "InitialTwinByCustomAllocation"
+        - "FromDpsWebHook2" : \<Registration ID of the enrollment list>
+    - For Impinj R700, it sets "Hostname" Property to change deivce's host name using IoT Plug and Play Device Model (and Parser)  
+        The hostname will be set to impinj-<YYYYMMDD>-<HHMMSS>
 
 1. The device is authenticated and DPS creates Device Identity in IoT Hub
 
@@ -146,7 +148,7 @@ When a device is provisioned, following operations take place.
 
 1. The `eventgrid_processor` function receives `DeviceConnected` event
 
-    `eventgrid_processor` adds Device Twin tag `EventGrid` = "Processed"
+    `eventgrid_processor` adds Device Twin tag `TagFromEventGrid` = "Processed"
 
 1. The device initiates authentication and connection to the IoT Hub
 

@@ -136,13 +136,13 @@ namespace DpsCustomPolicySample
                     // tags are for solution only, devices do not see tags
                     // https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-device-twins#device-twins
                     TwinCollection twinTags = new TwinCollection();
-                    twinTags["TagExample"] = "CustomAllocationSample";
+                    twinTags["TagFromDpsWebHook"] = "CustomAllocationSample";
 
                     // build initial twin (Desired Properties) for the device
                     // these values will be passed to the device during Initial Get
                     TwinCollection desiredProperties = new TwinCollection();
-                    desiredProperties["DesiredTest1"] = "InitialTwinByCustomAllocation";
-                    desiredProperties["DpsRegistrationId"] = registrationId;
+                    desiredProperties["FromDpsWebHook1"] = "InitialTwinByCustomAllocation";
+                    desiredProperties["FromDpsWebHook2"] = registrationId;
 
                     // Get DTDL Model Id
                     string componentName = string.Empty;

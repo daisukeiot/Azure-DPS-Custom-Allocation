@@ -8,7 +8,9 @@
 - Device Provisioning Service (DPS)
 - Event Grid Topic and Subscription
 - Azure Functions  
-    Azure Functions require App Service and Storage
+        - **dps_processor** : A Webhook function to receive and process when a device starts provisioning through DPS  
+        - **eventgrid_processor** : Event Grid Subscriber to receive IoT Hub device lifecycle events
+- Storage service and App Service for Azure Functions
 
 Provide following parameters
 
@@ -156,5 +158,7 @@ When a device is provisioned, following operations take place.
     - For Seeed Wio Terminal, it sends `ringBuzzer` command
 
 ### Flow Chart
+
+Summary of Device Provisioning flow ([PDF](https://github.com/daisukeiot/Azure-DPS-Custom-Allocation/blob/main/media/DPS-IoTHub-ProvisioningFlow.pdf))
 
 ![FlotChart](media/FlowChart.png)

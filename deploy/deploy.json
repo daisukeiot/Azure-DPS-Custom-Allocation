@@ -45,7 +45,7 @@
     "location": "[resourceGroup().location]",
     "iothub": {
       "name": "[format('{0}-{1}-hub', resourceGroup().name, parameters('ResourcePrefix'))]",
-      "systemTopicName": "[format('{0}-{1}-hub-topic, resourceGroup().name, parameters('ResourcePrefix'))]",
+      "systemTopicName": "[format('{0}-{1}-hub-topic, resourceGroup().name, parameters('ResourcePrefix'))]"
     },
     "storageName": "[toLower(format('{0}{1}storage', resourceGroup().name, parameters('ResourcePrefix')))]",
     "dpsName": "[format('{0}-{1}-dps', resourceGroup().name, parameters('ResourcePrefix'))]",

@@ -162,7 +162,7 @@ When a device is provisioned, following operations take place.
 1. The `eventgrid_processor` function receives `DeviceConnected` event
 
     - For Impinj device, it sends `Presets` command
-    - For Seeed Wio Terminal, it sends `ringBuzzer` command
+    - For [Seeed Wio Terminal](https://devicecatalog.azure.com/devices/8b9c5072-68fd-4fc3-8e5f-5b15e3a20bd9), it sends `ringBuzzer` command
 
 ![Explorer-01](media/IoT-Explorer-01.png)
 

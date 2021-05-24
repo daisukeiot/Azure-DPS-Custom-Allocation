@@ -1,36 +1,28 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "functionAppName": {
-        "type": "string"
-      },
-      "functionName": {
-        "type": "string"
-      },
-      "location": {
-        "type": "string"
-      }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "functionAppName": {
+      "type": "string"
     },
-    "variables": {},
-    "resources": [
-      {
-        "type": "Microsoft.Web/sites/functions",
-        "apiVersion": "2018-11-01",
-        "name": "[concat(parameters('functionAppName'), '/', parameters('functionName'))]",
-        "location": "[parameters('location')]",
-        "dependsOn": [],
-        "properties": {}
-      }
-    ],
-    "outputs": {
-      "functionKey": {
-        "type": "string",
-        "value": "[listsecrets(resourceId('Microsoft.Web/sites/functions', parameters('functionAppName'), parameters('functionName')),'2020-12-01').key]"
-      },
-      "functionTriggerUrl": {
-        "type": "string",
-        "value": "[listsecrets(resourceId('Microsoft.Web/sites/functions', parameters('functionAppName'), parameters('functionName')),'2020-12-01').trigger_url]"
-      }
+    "functionName": {
+      "type": "string"
+    },
+    "dpsName": {
+      "type": "string"
+    }
+  },
+  "variables": {},
+  "resources": [
+  ],
+  "outputs": {
+    "functionKey": {
+      "type": "string",
+      "value": "[listsecrets(resourceId('Microsoft.Web/sites/functions', parameters('functionAppName'), parameters('functionName')),'2020-12-01').key]"
+    },
+    "functionTriggerUrl": {
+      "type": "string",
+      "value": "[listsecrets(resourceId('Microsoft.Web/sites/functions', parameters('functionAppName'), parameters('functionName')),'2020-12-01').trigger_url]"
     }
   }
+}

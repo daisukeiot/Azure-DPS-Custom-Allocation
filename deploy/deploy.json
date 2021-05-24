@@ -335,6 +335,41 @@
       }
     },
     {
+      "type": "Microsoft.EventGrid/systemTopics/eventSubscriptions",
+      "apiVersion": "2020-10-15-preview",
+      "name": "[concat(variables('iothub').systemTopicName, '/IoTHubEventGridSubscription')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'Deploy-Functions')]",
+        "[resourceId('Microsoft.EventGrid/systemTopics', variables('iothub').systemTopicName)]",
+        "[resourceId('Microsoft.Web/sites/functions', variables('functionsApp').name, 'eventgrid_processor')]"
+      ],
+      "properties": {
+        "destination": {
+          "properties": {
+            "resourceId": "[resourceId('Microsoft.Web/sites/functions', variables('functionsApp').name, 'eventgrid_processor')]",
+            "maxEventsPerBatch": 1,
+            "preferredBatchSizeInKilobytes": 64
+          },
+          "endpointType": "AzureFunction"
+        },
+        "filter": {
+          "includedEventTypes": [
+            "Microsoft.Devices.DeviceCreated",
+            "Microsoft.Devices.DeviceDeleted",
+            "Microsoft.Devices.DeviceConnected",
+            "Microsoft.Devices.DeviceDisconnected"
+          ],
+          "enableAdvancedFilteringOnArrays": true
+        },
+        "labels": [],
+        "eventDeliverySchema": "EventGridSchema",
+        "retryPolicy": {
+          "maxDeliveryAttempts": 30,
+          "eventTimeToLiveInMinutes": 1440
+        }
+      }
+    },
+    {
       "name": "GetFunctionKey",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",

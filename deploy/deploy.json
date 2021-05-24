@@ -45,13 +45,13 @@
     "location": "[resourceGroup().location]",
     "iothub": {
       "name": "[format('{0}-{1}-hub', resourceGroup().name, parameters('ResourcePrefix'))]",
-      "systemTopicName": "IoTHubEventGridSystemTopic"
+      "systemTopicName": "[format('{0}-{1}-hub-topic, resourceGroup().name, parameters('ResourcePrefix'))]",
     },
     "storageName": "[toLower(format('{0}{1}storage', resourceGroup().name, parameters('ResourcePrefix')))]",
     "dpsName": "[format('{0}-{1}-dps', resourceGroup().name, parameters('ResourcePrefix'))]",
     "functionsApp": {
-      "hostingPlan": "[concat(parameters('ResourcePrefix'), '-HostingPlan-', parameters('UniqueID'))]",
-      "name": "[format('{0}-{1}-function', resourceGroup().name, parameters('ResourcePrefix'))]"
+      "hostingPlan": "[format('{0}-{1}-appsvc', resourceGroup().name, parameters('ResourcePrefix'))]",
+      "name": "[format('{0}-{1}-functions', resourceGroup().name, parameters('ResourcePrefix'))]"
     },
     "envTag": "v0.1"
   },

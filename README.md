@@ -27,12 +27,16 @@ Provide following parameters
 | Functions Repo URL    | URL of Functions source code Github Repo       | Take default or change this URL to your repo |
 | Functions Repo Branch | Branch name of Functions source code to deploy |                                              |
 
+> [!TIP]  
+> Storage Service name is up to 24 characters.  Keep name of resource group and unique id less than 20 characters
+
 Resources are named in following way:
 
 - \<Resource Group Name>-\<Unique ID>-hub
 - \<Resource Group Name>-\<Unique ID>-dps-topic
 - \<Resource Group Name>-\<Unique ID>-dps
 - \<Resource Group Name>-\<Unique ID>-appsvc  
+- \<Resource Group Name>\<Unique ID>stor  
   etc
 
 ## 2. Click `Reivew + create` to start deployment

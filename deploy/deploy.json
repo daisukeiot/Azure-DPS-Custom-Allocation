@@ -47,7 +47,7 @@
       "name": "[format('{0}-{1}-hub', resourceGroup().name, parameters('ResourcePrefix'))]",
       "systemTopicName": "[format('{0}-{1}-hub-topic', resourceGroup().name, parameters('ResourcePrefix'))]"
     },
-    "storageName": "[toLower(format('{0}{1}storage', resourceGroup().name, parameters('ResourcePrefix')))]",
+    "storageName": "[toLower(format('{0}{1}stor', resourceGroup().name, parameters('ResourcePrefix')))]",
     "dpsName": "[format('{0}-{1}-dps', resourceGroup().name, parameters('ResourcePrefix'))]",
     "functionsApp": {
       "hostingPlan": "[format('{0}-{1}-appsvc', resourceGroup().name, parameters('ResourcePrefix'))]",

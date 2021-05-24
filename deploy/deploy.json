@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "ResourcePrefix": {
-      "defaultValue": "DEMOCA",
+      "defaultValue": "DpsDemo",
       "type": "string",
       "metadata": {
         "description": "Prefix for services.  E.g. your name.  Must be Alphanumeric (a~z, 0~9), and 5~12 characters"
@@ -45,7 +45,7 @@
     "location": "[resourceGroup().location]",
     "iothub": {
       "name": "[format('{0}-{1}-hub', resourceGroup().name, parameters('ResourcePrefix'))]",
-      "systemTopicName": "[format('{0}-{1}-hub-topic, resourceGroup().name, parameters('ResourcePrefix'))]"
+      "systemTopicName": "[format('{0}-{1}-hub-topic', resourceGroup().name, parameters('ResourcePrefix'))]"
     },
     "storageName": "[toLower(format('{0}{1}storage', resourceGroup().name, parameters('ResourcePrefix')))]",
     "dpsName": "[format('{0}-{1}-dps', resourceGroup().name, parameters('ResourcePrefix'))]",

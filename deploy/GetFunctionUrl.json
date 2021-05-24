@@ -7,9 +7,6 @@
     },
     "functionName": {
       "type": "string"
-    },
-    "dpsName": {
-      "type": "string"
     }
   },
   "variables": {},

@@ -367,9 +367,17 @@
       "type": "String",
       "value": "[reference('GetFunctionKey').outputs.functionTriggerUrl.value]"
     },
+    "iotDpsIdScope": {
+      "value": "[reference(resourceId('Microsoft.Devices/ProvisioningServices', variables('dpsName'))).idScope]",
+      "type": "string"
+    },
     "CreateGroupEnrollment": {
       "type": "String",
-      "value": "[format('az extension add --name azure-iot; az iot dps enrollment-group create -g {0} --dps-name {1} --enrollment-id SampleGroupEnrollment --allocation-policy custom --webhook-url {2}', resourceGroup().name, variables('dpsName'), reference('GetFunctionKey').outputs.functionTriggerUrl.value)]"
+      "value": "[format('az extension add --name azure-iot; az iot dps enrollment-group create -g {0} --dps-name {1} --enrollment-id SampleGroupEnrollment --allocation-policy custom --webhook-url {2} --api-version 2019-03-31', resourceGroup().name, variables('dpsName'), reference('GetFunctionKey').outputs.functionTriggerUrl.value)]"
+    },
+    "CreateIndividualEnrollment": {
+      "type": "String",
+      "value": "[format('az extension add --name azure-iot; az iot dps enrollment create -g {0} --dps-name {1} --enrollment-id SampleIndividualEnrollment --allocation-policy custom --webhook-url {2} --api-version 2019-03-31 --attestation-type symmetricKey', resourceGroup().name, variables('dpsName'), reference('GetFunctionKey').outputs.functionTriggerUrl.value)]"
     }
   }
 }
